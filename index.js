@@ -26,19 +26,12 @@ const path = require("path");
       }
     }
 
-    const annotation_level = testSummary.isFailedOrErrored() ? "failure" : "notice";
-    const annotation = {
-      path: "test",
-      start_line: 0,
-      end_line: 0,
-      start_column: 0,
-      end_column: 0,
-      annotation_level,
-      message: testSummary.toFormattedMessage(),
-    };
+    const annotation_level = testSummary.isFailedOrErrored()
+      ? "failure"
+      : "notice";
 
-    const conclusion = testSummary.annotations.length === 0 ? "success" : "failure";
-    testSummary.annotations = [annotation, ...testSummary.annotations];
+    const conclusion =
+      testSummary.annotations.length === 0 ? "success" : "failure";
 
     const pullRequest = github.context.payload.pull_request;
     const link = (pullRequest && pullRequest.html_url) || github.context.ref;
@@ -68,7 +61,6 @@ const path = require("path");
 })();
 
 class TestSummary {
-
   maxNumFailures = -1;
 
   numTests = 0;
@@ -99,11 +91,17 @@ class TestSummary {
       return;
     }
 
-    if (this.maxNumFailures !== -1 && this.annotations.length >= this.maxNumFailures) {
+    if (
+      this.maxNumFailures !== -1 &&
+      this.annotations.length >= this.maxNumFailures
+    ) {
       return;
     }
 
-    const {filePath, line} = await module.exports.findTestLocation(file, testcase);
+    const { filePath, line } = await module.exports.findTestLocation(
+      file,
+      testcase
+    );
 
     this.annotations.push({
       path: filePath,
@@ -114,7 +112,7 @@ class TestSummary {
       annotation_level: "failure",
       title: testcase.$.name,
       message: TestSummary.formatFailureMessage(testcase),
-      raw_details: testcase.failure[0]._ || 'No details'
+      raw_details: testcase.failure[0]._ || "No details",
     });
   }
 
@@ -132,9 +130,8 @@ class TestSummary {
   }
 
   toFormattedMessage() {
-    return `Junit Results ran ${this.numTests} in ${this.testDuration} seconds ${this.numErrored} Errored, ${this.numFailed} Failed, ${this.numSkipped} Skipped`;
+    return `JUnit tests ran ${this.numTests} tests in ${this.testDuration} seconds with ${this.numErrored} errored, ${this.numFailed} failed, and ${this.numSkipped} skipped`;
   }
-
 }
 
 /**
@@ -183,7 +180,7 @@ async function readTestSuites(file) {
   const json = await parser.parseStringPromise(data);
 
   if (json.testsuites) {
-    return json.testsuites.testsuite
+    return json.testsuites.testsuite;
   }
   return [json.testsuite];
 }
@@ -214,8 +211,10 @@ async function findTestLocation(testReportFile, testcase) {
   let bestFilePath;
   let bestRelativePathLength = -1;
   for await (const candidateFile of filePaths.globGenerator()) {
-    let candidateRelativeLength = path.relative(testReportFile, candidateFile)
-      .length;
+    let candidateRelativeLength = path.relative(
+      testReportFile,
+      candidateFile
+    ).length;
 
     if (!bestFilePath || candidateRelativeLength < bestRelativePathLength) {
       bestFilePath = candidateFile;

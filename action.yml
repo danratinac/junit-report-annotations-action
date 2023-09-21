@@ -1,5 +1,5 @@
 name: "Junit Report to Annotations"
-description: "Create an annotation of the test run summary and also list first n failed tests as separate annotations"
+description: "List first n failed tests as separate annotations based on JUnit output."
 branding:
   icon: "box"
   color: "green"
@@ -22,7 +22,7 @@ inputs:
   name:
     description: "Name of the Check in the github actions UI"
     require: true
-    default: "Junit Results"
+    default: "JUnit Results"
 runs:
   using: "node16"
   main: "index.js"
